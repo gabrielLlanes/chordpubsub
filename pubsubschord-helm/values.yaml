@@ -1,0 +1,36 @@
+# Default values for pubsubschord-helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+deployments:
+  - number: 1
+    notificationName: eth_price
+    httpRequestPeriod: 20000
+    chordFirstNode: true
+  - number: 2
+    notificationName: btc_price
+    chordJoinNodeHostNumber: 1
+    httpRequestPeriod: 20000
+    chordFirstNode: false
+  - number: 3
+    notificationName: binance_price
+    chordJoinNodeHostNumber: 2
+    httpRequestPeriod: 20000
+    chordFirstNode: false
+  - number: 4
+    notificationName: dallas_weather
+    chordJoinNodeHostNumber: 3
+    httpRequestPeriod: 5000
+    chordFirstNode: false
+  - number: 5
+    notificationName: los_angeles_weather
+    chordJoinNodeHostNumber: 4
+    httpRequestPeriod: 5000
+    chordFirstNode: false
+  - number: 6
+    notificationName: long_island_weather
+    chordJoinNodeHostNumber: 5
+    httpRequestPeriod: 5000
+    chordFirstNode: false
+
+image:
+  imagePullPolicy: Always

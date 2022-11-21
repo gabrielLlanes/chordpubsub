@@ -1,0 +1,158 @@
+package chord.fingertable;
+
+import chord.node.RemotePubSubChordNode;
+import chord.util.Modulo;
+import chord.util.Util;
+import chord.util.ModuloInterval;
+import pubsub.subscription.DisjunctionSubscription;
+import pubsub.subscription.Subscription;
+
+public class FingerTableImpl<T extends RemotePubSubChordNode<T>>
+    implements FingerTable<T> {
+
+  private final int id;
+
+  private final Modulo modulo;
+
+  private final Object[] fingerTable;
+
+  public FingerTableImpl(int degree, int id) {
+    this.id = id;
+    this.modulo = new Modulo(Util.powerOf2(degree));
+    this.fingerTable = new Object[degree + 1];
+  }
+
+  public FingerTableImpl(int degree, int id, Object[] fingerTable) {
+    this.id = id;
+    this.modulo = new Modulo(Util.powerOf2(degree));
+    if (fingerTable.length != degree + 1) {
+      throw new IllegalArgumentException("Finger table should be one greater than the degree.");
+    }
+    this.fingerTable = fingerTable;
+  }
+
+  @Override
+  public int getId() {
+    return id;
+  }
+
+  @Override
+  public int size() {
+    return fingerTable.length - 1;
+  }
+
+  @Override
+  public boolean containsNodeWithId(int id) {
+    for (int i = 1; i < fingerTable.length; i++) {
+      if (getId(i) == id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public synchronized void set(int index, int id, T chordNode) {
+    FingerTableEntry<T> entry = new FingerTableEntry<>(id, chordNode);
+    fingerTable[index] = entry;
+  }
+
+  @Override
+  public synchronized T getNode(int index) {
+    FingerTableEntry<T> fingerTableEntry = getEntry(index);
+    return (T) fingerTableEntry.getNode();
+  }
+
+  @Override
+  public int getId(int index) {
+    FingerTableEntry<T> fingerTableEntry = getEntry(index);
+    return fingerTableEntry.getId();
+  }
+
+  @SuppressWarnings("unchecked")
+  private FingerTableEntry<T> getEntry(int index) {
+    return (FingerTableEntry<T>) fingerTable[index];
+  }
+
+  @Override
+  public ModuloInterval assignedToEntry(int i) {
+    if (i < size()) {
+      int k;
+      for (k = i + 1; k <= size() && getId(k) == getId(i); k++)
+        ;
+      if (k <= size()) {
+        return modulo.interval(getId(i), getId(k) - 1);
+      }
+    }
+    return modulo.interval(getId(i), this.id - 1);
+  }
+
+  @Override
+  public ModuloInterval assignedToNode(int id) {
+    for (int j = 1; j < fingerTable.length; j++) {
+      int entryId = getId(j);
+      if (entryId == id) {
+        int k;
+        for (k = j + 1; k <= size() && getId(k) == entryId; k++)
+          ;
+        if (k <= size()) {
+          return modulo.interval(entryId, getId(k) - 1);
+        } else {
+          return modulo.interval(entryId, this.id - 1);
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void setSubscriptionToEntry(int index, Subscription subscription) {
+    getEntry(index).setSubscription(subscription);
+  }
+
+  @Override
+  public void addSubscriptionToEntry(int index, Subscription subscription) {
+    getEntry(index).addSubscription(subscription);
+  }
+
+  @Override
+  public void addSubscriptionToNode(int id, Subscription subscription) {
+    for (int i = 1; i < fingerTable.length; i++) {
+      if (getId(i) == id) {
+        addSubscriptionToEntry(i, subscription);
+      }
+    }
+  }
+
+  @Override
+  public DisjunctionSubscription getSubscriptionOfEntry(int index) {
+    return getEntry(index).getDisjunctionSubscription();
+
+  }
+
+  @Override
+  public void removeSubscriptionOfEntry(int index, Subscription subscription) {
+    getEntry(index).removeSubscription(subscription);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder s = new StringBuilder();
+    s.append('[');
+    for (int i = 0; i < fingerTable.length; i++) {
+      if (fingerTable[i] == null) {
+        s.append("null");
+      } else {
+        s.append(
+            String.format("%d successor: %d", (id + Util.powerOf2(i - 1)) % Util.powerOf2((fingerTable.length - 1)),
+                getId(i)));
+      }
+      if (i == fingerTable.length - 1) {
+      } else {
+        s.append(", ");
+      }
+    }
+    s.append(']');
+    return s.toString();
+  }
+}
