@@ -3,7 +3,7 @@ package chord.node;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import chord.util.Modulo.ModuloInterval;
+import chord.util.ModuloInterval;
 import pubsub.notification.Notification;
 import pubsub.subscription.Subscription;
 

@@ -1,7 +1,5 @@
 package pubsub.subscription.predicate;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -10,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @param <T> the extending class of JsonNode for which the predicate can be
  *            applied.
  */
-public interface Predicate<T extends JsonNode> extends java.util.function.Predicate<T>, Serializable {
+public interface Predicate<T extends JsonNode> extends java.util.function.Predicate<T>, java.io.Serializable {
 
   public boolean test(T jsonNode);
 

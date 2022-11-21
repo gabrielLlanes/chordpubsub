@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.databind.node.NumericNode;
 
-public class NumberConjunctionPredicate<T extends NumericNode> extends NumberPredicate<T> {
+public class NumberConjunctionPredicate<S extends Number, T extends NumericNode> extends NumberPredicate<S, T> {
 
   private Set<Object> predicates = new HashSet<>();
 
@@ -14,10 +14,10 @@ public class NumberConjunctionPredicate<T extends NumericNode> extends NumberPre
   }
 
   @SuppressWarnings("unchecked")
-  public NumberConjunctionPredicate(NumberPredicate<?>... predicates) {
+  public NumberConjunctionPredicate(NumberPredicate<?, ?>... predicates) {
     try {
-      for (NumberPredicate<?> predicate : predicates) {
-        this.predicates.add((NumberPredicate<T>) predicate);
+      for (NumberPredicate<?, ?> predicate : predicates) {
+        this.predicates.add((NumberPredicate<S, T>) predicate);
       }
     } catch (ClassCastException e) {
       throw new IllegalArgumentException("inappropriate predicate was submitted to constructor", e);
@@ -32,7 +32,7 @@ public class NumberConjunctionPredicate<T extends NumericNode> extends NumberPre
   @Override
   public boolean test(T jsonNode) {
     for (Object predicate : predicates) {
-      NumberPredicate<T> _predicate = (NumberPredicate<T>) predicate;
+      NumberPredicate<S, T> _predicate = (NumberPredicate<S, T>) predicate;
       if (!_predicate.test(jsonNode))
         return false;
     }
@@ -44,7 +44,7 @@ public class NumberConjunctionPredicate<T extends NumericNode> extends NumberPre
   public boolean equals(Object obj) {
     if (obj instanceof NumberConjunctionPredicate) {
       try {
-        NumberConjunctionPredicate<T> _obj = (NumberConjunctionPredicate<T>) obj;
+        NumberConjunctionPredicate<S, T> _obj = (NumberConjunctionPredicate<S, T>) obj;
         return this.predicates.equals(_obj.getPredicates());
       } catch (ClassCastException e) {
         return false;

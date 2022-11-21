@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.NumericNode;
 
 import pubsub.subscription.predicate.number.NumberPredicate;
 
-public abstract class NumberUpperBoundPredicate<S extends Number, T extends NumericNode> extends NumberPredicate<T> {
+public abstract class NumberUpperBoundPredicate<S extends Number, T extends NumericNode> extends NumberPredicate<S, T> {
 
   protected final S upperBound;
 

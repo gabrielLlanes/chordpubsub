@@ -3,7 +3,7 @@ package chord.fingertable;
 import chord.node.RemotePubSubChordNode;
 import chord.util.Modulo;
 import chord.util.Util;
-import chord.util.Modulo.ModuloInterval;
+import chord.util.ModuloInterval;
 import pubsub.subscription.DisjunctionSubscription;
 import pubsub.subscription.Subscription;
 

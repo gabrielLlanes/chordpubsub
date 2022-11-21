@@ -4,6 +4,6 @@ import com.fasterxml.jackson.databind.node.NumericNode;
 
 import pubsub.subscription.predicate.ValuePredicate;
 
-public abstract class NumberPredicate<T extends NumericNode> implements ValuePredicate<T> {
+public abstract class NumberPredicate<S extends Number, T extends NumericNode> implements ValuePredicate<T> {
 
 }

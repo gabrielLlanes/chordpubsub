@@ -100,23 +100,8 @@ public class Modulo {
     return intersects(i1.a, i1.b, i2.a, i2.b);
   }
 
-  public class ModuloInterval implements java.io.Serializable {
-    public int a;
-    public int b;
-
-    public ModuloInterval(int a, int b) {
-      this.a = mod(a);
-      this.b = mod(b);
-    }
-
-    @Override
-    public String toString() {
-      return String.format("[%d, %d]", a, b);
-    }
-  }
-
   public ModuloInterval interval(int a, int b) {
-    return new ModuloInterval(a, b);
+    return new ModuloInterval(mod(a), mod(b));
   }
 
   // n mod modulus

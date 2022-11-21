@@ -1,6 +1,7 @@
 package chord.node;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import chord.fingertable.FingerTableImpl;
 import chord.util.Modulo;
 import chord.util.Util;
-import chord.util.Modulo.ModuloInterval;
+import chord.util.ModuloInterval;
 import pubsub.notification.Notification;
 import pubsub.subscription.DisjunctionSubscription;
 import pubsub.subscription.Subscription;
@@ -19,6 +20,7 @@ import pubsub.subscription.Subscription;
  * Base class for universal chord operations and members
  */
 public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>>
+    extends UnicastRemoteObject
     implements RemotePubSubChordNode<T> {
 
   /* the identifier of this node in the chord network */
@@ -65,21 +67,21 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     this.degree = degree;
     int modulus = Util.powerOf2(degree);
     this.modulus = modulus;
-    this.id = id;
-    this.fingerTable = new FingerTableImpl<>(degree, id);
     this.modulo = new Modulo(modulus);
+    this.id = modulo.mod(id);
+    this.fingerTable = new FingerTableImpl<>(degree, id);
   }
 
   protected AbstractPubSubChordNode(int degree, int id, boolean initial) throws RemoteException {
     this.degree = degree;
     int modulus = Util.powerOf2(degree);
     this.modulus = modulus;
-    this.id = id;
+    this.modulo = new Modulo(modulus);
+    this.id = modulo.mod(id);
     this.fingerTable = new FingerTableImpl<>(degree, id, new Object[degree + 1]);
     for (int i = 0; i <= degree; i++) {
       fingerTable.set(i, id, self());
     }
-    this.modulo = new Modulo(modulus);
   }
 
   /**
@@ -88,7 +90,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
   protected abstract T self();
 
   /**
-   * join the network using information from the node
+   * join the network using information from the given node
    * 
    * @param chordNode the existing node of the network utilized to join this node
    *                  to the chord
@@ -364,4 +366,6 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     }
     return String.format("{chord %s:\nfinger table: %s\nclients: %s}", getId(), fingerTable, clientIds);
   }
+
+  // public String getString()
 }
