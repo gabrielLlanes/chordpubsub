@@ -85,6 +85,7 @@ public class ConsistentFingerPubSubChordNodeImpl
 
   @Override
   public void join(ConsistentFingerRemotePubSubChordNode chordNode) throws RemoteException {
+    lock.lock();
     // initialize the finger table of this node
     initFingerTable(chordNode);
     // and then update the other nodes of this node's entry into the chord.
@@ -99,6 +100,7 @@ public class ConsistentFingerPubSubChordNodeImpl
       ConsistentFingerRemotePubSubChordNode fingerTableCurrNode = fingerTable.getNode(i);
       fingerTableCurrNode.updateSubscriptionEdge(getId());
     }
+    lock.unlock();
   }
 
   @Override

@@ -6,9 +6,45 @@ plugins {
     id 'pubsubschord.java-application-conventions'
 }
 
+version = '1.0.0'
+
 dependencies {
-    implementation 'org.apache.commons:commons-text'
-    implementation project(':utilities')
+    implementation project(':chord')
+    implementation project(':pubsub')
+}
+
+// jar {
+//     manifest {
+//         attributes(
+//             'Main-Class': 'pubsubschord.app.App'
+//         )
+//     }
+//         //use fat jar with dependencies
+//     from {
+//         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//     }
+//     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//     archiveBaseName = 'chordpubsubnode'
+// }
+
+tasks.register('uberJar', Jar) {
+    archiveClassifier = 'uber'
+
+    manifest {
+        attributes(
+            'Main-Class': 'pubsubschord.app.App'
+        )
+    }
+
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveBaseName = 'chordpubsubnode'
 }
 
 application {

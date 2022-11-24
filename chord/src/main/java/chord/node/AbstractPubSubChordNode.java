@@ -1,5 +1,6 @@
 package chord.node;
 
+import java.lang.System.Logger;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -7,11 +8,19 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.lang.System.Logger.Level;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.cp.CPSubsystem;
+import com.hazelcast.cp.lock.FencedLock;
 
 import chord.fingertable.FingerTableImpl;
 import chord.util.Modulo;
-import chord.util.Util;
 import chord.util.ModuloInterval;
+import chord.util.Util;
 import pubsub.notification.Notification;
 import pubsub.subscription.DisjunctionSubscription;
 import pubsub.subscription.Subscription;
@@ -22,6 +31,29 @@ import pubsub.subscription.Subscription;
 public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>>
     extends UnicastRemoteObject
     implements RemotePubSubChordNode<T> {
+
+  private static final Logger log = System.getLogger(AbstractPubSubChordNode.class.getName());
+
+  /*
+   * Use Hazelcast distributed concurrency for node joins and subscription
+   * updates. One important problem in this pub-sub chord is the fact that all
+   * operations that update subscription and/or routing information, such as node
+   * joins or subscriptions, need to be exclusive with respect to each other, and
+   * some do not, such as notification publishing. This is a
+   * variation of the read-write mutual lock problem. Since Hazelcast provides no
+   * mechanism for distributed read-write locking, this publish-subscribe chord
+   * should be only viewed as a "best effort" service. Oprations updating
+   * subscription/routing information will be mutually exclusive with each other,
+   * but not with notification publishing. Notification delivery may fail if
+   * routing information updates are propagating at the same time that a
+   * notification is being published. Hence, this chord works better when there
+   * subscription updates are not expected to be frequent.
+   */
+  private static final String lockName = "LOCK";
+  private static final Config config = new Config();
+  private static final HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
+  private static final CPSubsystem cpSubsystem = instance.getCPSubsystem();
+  protected static final FencedLock lock = cpSubsystem.getLock(lockName);
 
   /* the identifier of this node in the chord network */
   protected final int id;
@@ -69,7 +101,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     this.modulus = modulus;
     this.modulo = new Modulo(modulus);
     this.id = modulo.mod(id);
-    this.fingerTable = new FingerTableImpl<>(degree, id);
+    this.fingerTable = new FingerTableImpl<>(degree, this.id);
   }
 
   protected AbstractPubSubChordNode(int degree, int id, boolean initial) throws RemoteException {
@@ -78,9 +110,11 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     this.modulus = modulus;
     this.modulo = new Modulo(modulus);
     this.id = modulo.mod(id);
-    this.fingerTable = new FingerTableImpl<>(degree, id, new Object[degree + 1]);
-    for (int i = 0; i <= degree; i++) {
-      fingerTable.set(i, id, self());
+    this.fingerTable = new FingerTableImpl<>(degree, this.id);
+    if (initial) {
+      for (int i = 0; i <= degree; i++) {
+        fingerTable.set(i, this.id, self());
+      }
     }
   }
 
@@ -175,7 +209,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
   }
 
   @Override
-  public synchronized T findSuccessor(int n) throws RemoteException {
+  public T findSuccessor(int n) throws RemoteException {
     T nPredecessor = findPredecessor(n);
     // if predecessor of n has id equal to n, then
     // the successor also has id equal to n
@@ -187,7 +221,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
   }
 
   @Override
-  public synchronized T findPredecessor(int n) throws RemoteException {
+  public T findPredecessor(int n) throws RemoteException {
     T currPredecessor = self();
     T currSuccessor = currPredecessor.getImmediateSuccessor();
     // while currPredecessor <= n < currSuccessor is false
@@ -207,9 +241,18 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    * Implementation of the mutlicast algorithm
    */
   @Override
-  public void publish(Notification notification, int publisherId, ModuloInterval range) throws RemoteException {
+  public void publish(String notificationJsonString, int publisherId, ModuloInterval range) throws RemoteException {
+    Notification notification = null;
+    try {
+      notification = new Notification(notificationJsonString);
+    } catch (JsonProcessingException e) {
+      log.log(Level.WARNING, "Could not deserialize the notification string: {0}", notificationJsonString);
+      return;
+    }
     if (loopBackSubscription != null && loopBackSubscription.matches(notification)) {
       notificationQueue.offer(notification);
+    } else if (loopBackSubscription != null && !loopBackSubscription.matches(notification)) {
+      log.log(Level.INFO, "DID NOT MATCH: {0} AND {1}\n", notificationJsonString, loopBackSubscription);
     }
     Set<Integer> tested = new HashSet<>();
     for (int i = 1; i <= fingerTable.size(); i++) {
@@ -224,12 +267,10 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
         if (subscriptions != null && subscriptions.matches(notification)) {
           T fingerTableIthNode = fingerTable.getNode(i);
           int intersectionIntervalRight = modulo.inClosed(assigned.b, range) ? assigned.b : range.b;
-          // System.out
-          // .println(String.format("Publish at %d requested by %d. Now publishing to %d
-          // with interval %s", getId(),
-          // publisherId, fingerTableIthId, modulo.new ModuloInterval(assigned.a,
-          // intersectionIntervalRight)));
-          fingerTableIthNode.publish(notification, getId(), modulo.interval(assigned.a, intersectionIntervalRight));
+          log.log(Level.INFO, "Notification publishing by {0} to {1}. Initial Interval is {2}\n", getId(),
+              fingerTableIthId, modulo.interval(assigned.a, intersectionIntervalRight));
+          fingerTableIthNode.publish(notificationJsonString, getId(),
+              modulo.interval(assigned.a, intersectionIntervalRight));
         }
       }
     }
@@ -244,23 +285,21 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     Set<Integer> publishedTo = new HashSet<>();
     for (int i = 1; i <= fingerTable.size(); i++) {
       int currNodeId = fingerTable.getId(i);
-      if (publishedTo.contains(currNodeId)) {
+      if (publishedTo.contains(currNodeId) || currNodeId == getId()) {
         continue;
       }
       publishedTo.add(currNodeId);
       ModuloInterval intervalAssignedToEntry = fingerTable.assignedToEntry(i);
-      System.out
-          .println(
-              String.format("Notification published by %d to %d. Initial Interval is %s", getId(), currNodeId,
-                  intervalAssignedToEntry));
-      fingerTable.getNode(i).publish(notification, getId(), intervalAssignedToEntry);
+      log.log(Level.INFO,
+          "Notification publishing by {0} to {1}. Initial Interval is {2}\n", getId(), currNodeId,
+          intervalAssignedToEntry);
+      fingerTable.getNode(i).publish(notification.notificationJsonString(), getId(), intervalAssignedToEntry);
     }
   }
 
   /*
-   * Uses the interval intersection test and subscription union algorithm of
-   * <a href="https://dl.acm.org/doi/abs/10.1145/966618.966627">A
-   * peer-to-peer approach to content-based publish/subscribe</a>
+   * Uses the interval intersection test and filter union algorithm implemented
+   * below
    */
   @Override
   public void subscribe(Subscription subscription, int callerId) throws RemoteException {
@@ -286,25 +325,10 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     }
   }
 
-  // DisjunctionSubscription propagate = new
-  // DisjunctionSubscription(subscription);
-  // Set<Integer> tested = new HashSet<>();
-  // for (int i = 1, fingerTableIthId = fingerTable.getId(i); i <=
-  // fingerTable.size(); i++) {
-  // if (tested.contains(fingerTableIthId)) {
-  // continue;
-  // }
-  // tested.add(fingerTableIthId);
-  // ModuloInterval fingerTableIthInterval = fingerTable.assignedToEntry(i);
-  // if (fingerTableIthId != getId()
-  // && fingerTableIthId != callerId
-  // && modulo.intersects(assignedByClient, fingerTableIthInterval)) {
-  // propagate.addSubscription(fingerTable.getSubscriptionOfEntry(i));
-  // }
-  // }
-
   /*
-   * The filter union algorithm
+   * The filter union algorithm of <a
+   * href="https://dl.acm.org/doi/abs/10.1145/966618.966627">A peer-to-peer
+   * approach to content-based publish/subscribe</a>
    */
   public DisjunctionSubscription computeFilterUnion(ModuloInterval assignedByClient) {
     DisjunctionSubscription union = new DisjunctionSubscription();
@@ -328,12 +352,14 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    * propagation of changes to the rest of the chord.
    */
   public void subscribe(Subscription subscription) throws RemoteException {
+    lock.lock();
     setLoopBackSubscription(subscription);
     for (T client : clients) {
       if (client.getId() != getId()) {
         client.subscribe(subscription, id);
       }
     }
+    lock.unlock();
   }
 
   @Override
@@ -364,8 +390,6 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     } catch (RemoteException e) {
       clientIds = "could not fetch client ids";
     }
-    return String.format("{chord %s:\nfinger table: %s\nclients: %s}", getId(), fingerTable, clientIds);
+    return String.format("{chord %s:\nfinger table:\n%s\nclients: %s}", getId(), fingerTable, clientIds);
   }
-
-  // public String getString()
 }

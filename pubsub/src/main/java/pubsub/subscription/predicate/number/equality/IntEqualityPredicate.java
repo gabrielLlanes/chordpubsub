@@ -1,15 +1,11 @@
 package pubsub.subscription.predicate.number.equality;
 
-import com.fasterxml.jackson.databind.node.IntNode;
+import pubsub.subscription.predicate.PredicateType;
 
-public class IntEqualityPredicate extends NumberEqualityPredicate<Integer, IntNode> {
+public class IntEqualityPredicate extends NumberEqualityPredicate<Integer> {
 
-  protected IntEqualityPredicate(Integer number) {
-    super(number);
+  public IntEqualityPredicate(Integer number) {
+    super(PredicateType.INT, number);
   }
 
-  @Override
-  public boolean test(IntNode jsonNode) {
-    return number.intValue() == jsonNode.intValue();
-  }
 }

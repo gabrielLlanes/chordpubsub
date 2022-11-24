@@ -2,11 +2,9 @@ package pubsub.subscription.predicate.string.equality;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.node.TextNode;
+import pubsub.subscription.predicate.string.StringPredicate;
 
-import pubsub.subscription.predicate.ValuePredicate;
-
-public class StringEqualityPredicate implements ValuePredicate<TextNode> {
+public class StringEqualityPredicate extends StringPredicate {
 
   private final String string;
 
@@ -15,8 +13,8 @@ public class StringEqualityPredicate implements ValuePredicate<TextNode> {
   }
 
   @Override
-  public boolean test(TextNode jsonNode) {
-    return jsonNode.textValue().equals(string);
+  public boolean test(String value) {
+    return this.string.equals(value);
   }
 
   public String getString() {

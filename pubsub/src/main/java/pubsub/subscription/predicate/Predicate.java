@@ -1,27 +1,36 @@
 package pubsub.subscription.predicate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
- * Predicate that can be applied to a single JsonNode
+ * Predicate that can be applied to a single value
  * 
- * @param <T> the extending class of JsonNode for which the predicate can be
+ * @param <T> the type of value for which the predicate can be
  *            applied.
  */
-public interface Predicate<T extends JsonNode> extends java.util.function.Predicate<T>, java.io.Serializable {
+public abstract class Predicate<T> implements java.util.function.Predicate<T>, java.io.Serializable {
 
-  public boolean test(T jsonNode);
+  protected final PredicateType predicateType;
+
+  protected Predicate(PredicateType predicateType) {
+    this.predicateType = predicateType;
+  }
+
+  public PredicateType getPredicateType() {
+    return predicateType;
+  }
+
+  public abstract boolean test(T value);
 
   @SuppressWarnings("unchecked")
-  public default boolean _test(JsonNode jsonNode) {
-    if (jsonNode == null)
+  public boolean testWithTypeCastHandling(Object value) {
+    if (value == null)
       return false;
-    T _jsonNode;
+    T typeCastValue;
     try {
-      _jsonNode = (T) jsonNode;
+      typeCastValue = (T) value;
+      boolean test = test(typeCastValue);
+      return test;
     } catch (ClassCastException e) {
       return false;
     }
-    return test(_jsonNode);
   }
 }

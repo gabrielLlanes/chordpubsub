@@ -1,9 +1,12 @@
 package pubsub.subscription.predicate.number;
 
-import com.fasterxml.jackson.databind.node.NumericNode;
+import pubsub.subscription.predicate.Predicate;
+import pubsub.subscription.predicate.PredicateType;
 
-import pubsub.subscription.predicate.ValuePredicate;
+public abstract class NumberPredicate<T extends Number> extends Predicate<T> {
 
-public abstract class NumberPredicate<S extends Number, T extends NumericNode> implements ValuePredicate<T> {
+  protected NumberPredicate(PredicateType predicateType) {
+    super(predicateType);
+  }
 
 }

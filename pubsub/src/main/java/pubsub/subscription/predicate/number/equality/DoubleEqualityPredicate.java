@@ -1,16 +1,16 @@
 package pubsub.subscription.predicate.number.equality;
 
-import com.fasterxml.jackson.databind.node.DoubleNode;
+import pubsub.subscription.predicate.PredicateType;
 
-public class DoubleEqualityPredicate extends NumberEqualityPredicate<Double, DoubleNode> {
+public class DoubleEqualityPredicate extends NumberEqualityPredicate<Double> {
 
-  protected DoubleEqualityPredicate(Double number) {
-    super(number);
+  public DoubleEqualityPredicate(Double number) {
+    super(PredicateType.DOUBLE, number);
   }
 
   @Override
-  public boolean test(DoubleNode jsonNode) {
-    return number.doubleValue() == jsonNode.doubleValue();
+  public String toString() {
+    return String.format("{predicate: double equal to %s}", number);
   }
 
 }

@@ -1,15 +1,11 @@
 package pubsub.subscription.predicate.number.equality;
 
-import com.fasterxml.jackson.databind.node.LongNode;
+import pubsub.subscription.predicate.PredicateType;
 
-public class LongEqualityPredicate extends NumberEqualityPredicate<Long, LongNode> {
+public class LongEqualityPredicate extends NumberEqualityPredicate<Long> {
 
-  protected LongEqualityPredicate(Long number) {
-    super(number);
+  public LongEqualityPredicate(Long number) {
+    super(PredicateType.LONG, number);
   }
 
-  @Override
-  public boolean test(LongNode jsonNode) {
-    return number.longValue() == jsonNode.longValue();
-  }
 }

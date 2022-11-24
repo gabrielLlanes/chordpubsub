@@ -1,15 +1,11 @@
 package pubsub.subscription.predicate.number.equality;
 
-import com.fasterxml.jackson.databind.node.FloatNode;
+import pubsub.subscription.predicate.PredicateType;
 
-public class FloatEqualityPredicate extends NumberEqualityPredicate<Float, FloatNode> {
+public class FloatEqualityPredicate extends NumberEqualityPredicate<Float> {
 
-  protected FloatEqualityPredicate(Float number) {
-    super(number);
+  public FloatEqualityPredicate(Float number) {
+    super(PredicateType.FLOAT, number);
   }
 
-  @Override
-  public boolean test(FloatNode jsonNode) {
-    return number.floatValue() == jsonNode.floatValue();
-  }
 }

@@ -68,7 +68,7 @@ public class Modulo {
   }
 
   public boolean inClosed(int n, ModuloInterval interval) {
-    return inOpen(n, interval.a, interval.b);
+    return inClosed(n, interval.a, interval.b);
   }
 
   private ModuloInterval regularIntersection(int a1, int b1, int a2, int b2) {

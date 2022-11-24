@@ -2,22 +2,22 @@ package pubsub.subscription.predicate.number.lowerbound;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.node.NumericNode;
-
+import pubsub.subscription.predicate.PredicateType;
 import pubsub.subscription.predicate.number.NumberPredicate;
 
-public abstract class NumberLowerBoundPredicate<S extends Number, T extends NumericNode> extends NumberPredicate<S, T> {
+public abstract class NumberLowerBoundPredicate<T extends Number> extends NumberPredicate<T> {
 
-  protected final S lowerBound;
+  protected final T lowerBound;
 
   protected final boolean inclusive;
 
-  protected NumberLowerBoundPredicate(S lowerBound, boolean inclusive) {
+  protected NumberLowerBoundPredicate(PredicateType predicateType, T lowerBound, boolean inclusive) {
+    super(predicateType);
     this.lowerBound = lowerBound;
     this.inclusive = inclusive;
   }
 
-  public S getLowerBound() {
+  public T getLowerBound() {
     return lowerBound;
   }
 
@@ -29,7 +29,7 @@ public abstract class NumberLowerBoundPredicate<S extends Number, T extends Nume
   @Override
   public boolean equals(Object obj) {
     try {
-      NumberLowerBoundPredicate<S, T> _obj = (NumberLowerBoundPredicate<S, T>) obj;
+      NumberLowerBoundPredicate<T> _obj = (NumberLowerBoundPredicate<T>) obj;
       return lowerBound.equals(_obj.getLowerBound()) && (!(inclusive ^ _obj.isInclusive()));
     } catch (ClassCastException e) {
       return false;

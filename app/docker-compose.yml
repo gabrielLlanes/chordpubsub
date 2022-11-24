@@ -1,0 +1,165 @@
+version: "3.7"
+
+services:
+  node-1:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-1
+      CHORD_FIRST_NODE: true
+      RMI_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.0.133
+  node-2:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-2
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-1
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.1.18
+  node-3:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-3
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-2
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.3.11
+  node-4:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-4
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-1
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.5.57
+  node-5:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-5
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-3
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.7.76
+  node-6:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-6
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-4
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.8.63
+  node-7:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-7
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-6
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.9.19
+  node-8:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-8
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-5
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.11.82
+  node-9:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-9
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-8
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.11.151
+  node-10:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-10
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-9
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.12.122
+  node-11:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-11
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-4
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.15.139
+  node-12:
+    image: chordpubsubnode
+    command: java -jar /app/app.jar
+    environment:
+      CHORD_DEGREE: 12
+      CHORD_HOSTNAME: node-12
+      CHORD_FIRST_NODE: false
+      RMI_PORT: 1099
+      CHORD_JOIN_NODE_HOSTNAME: node-7
+      CHORD_JOIN_NODE_PORT: 1099
+    networks:
+      chord_network:
+        ipv4_address: 172.22.15.201
+
+networks:
+  chord_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.22.0.0/20
+          gateway: 172.22.0.1

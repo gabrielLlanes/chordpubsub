@@ -68,6 +68,6 @@ public interface FingerTable<T extends RemotePubSubChordNode<T>> {
 
   public DisjunctionSubscription getSubscriptionOfEntry(int index);
 
-  public void removeSubscriptionOfEntry(int index, Subscription matcher);
+  public void removeSubscriptionOfEntry(int index, Subscription subscription);
 
 }

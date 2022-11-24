@@ -3,8 +3,6 @@ package pubsub.subscription.predicate.string.regex;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.databind.node.TextNode;
-
 import pubsub.subscription.predicate.string.StringPredicate;
 
 public class RegexStringPredicate extends StringPredicate {
@@ -20,8 +18,8 @@ public class RegexStringPredicate extends StringPredicate {
   }
 
   @Override
-  public boolean test(TextNode jsonNode) {
-    return Pattern.matches(regex, jsonNode.textValue());
+  public boolean test(String value) {
+    return Pattern.matches(regex, value);
   }
 
   @Override
@@ -37,6 +35,11 @@ public class RegexStringPredicate extends StringPredicate {
   @Override
   public int hashCode() {
     return Objects.hash("regexstringpredicate", regex);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("{predicate: %s regex}", regex);
   }
 
 }

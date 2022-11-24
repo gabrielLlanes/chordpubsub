@@ -2,27 +2,32 @@ package pubsub.subscription.predicate.number.equality;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.node.NumericNode;
-
+import pubsub.subscription.predicate.PredicateType;
 import pubsub.subscription.predicate.number.NumberPredicate;
 
-public abstract class NumberEqualityPredicate<S extends Number, T extends NumericNode> extends NumberPredicate<S, T> {
+public abstract class NumberEqualityPredicate<T extends Number> extends NumberPredicate<T> {
 
-  protected final S number;
+  protected final T number;
 
-  protected NumberEqualityPredicate(S number) {
+  protected NumberEqualityPredicate(PredicateType predicateType, T number) {
+    super(predicateType);
     this.number = number;
   }
 
-  public S getNumber() {
+  public T getNumber() {
     return number;
+  }
+
+  @Override
+  public final boolean test(T value) {
+    return value.equals(number);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
     try {
-      NumberEqualityPredicate<S, T> _obj = (NumberEqualityPredicate<S, T>) obj;
+      NumberEqualityPredicate<T> _obj = (NumberEqualityPredicate<T>) obj;
       return number.equals(_obj.getNumber());
     } catch (ClassCastException e) {
       return false;

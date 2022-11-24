@@ -21,6 +21,10 @@ public class DisjunctionSubscription implements Subscription {
     }
   }
 
+  public int size() {
+    return subscriptions.size();
+  }
+
   public DisjunctionSubscription() {
     this.subscriptions = new HashSet<>();
   }

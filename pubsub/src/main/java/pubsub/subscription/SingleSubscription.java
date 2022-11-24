@@ -5,10 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.node.ValueNode;
-
 import pubsub.notification.Notification;
-import pubsub.subscription.predicate.ValuePredicate;
+import pubsub.subscription.predicate.Predicate;
 import pubsub.subscription.predicate.object.ObjectPredicate;
 
 public class SingleSubscription implements Subscription {
@@ -24,6 +22,9 @@ public class SingleSubscription implements Subscription {
 
   @Override
   public boolean matches(Notification notification) {
+    if (notification == null) {
+      return false;
+    }
     return subscriptionPredicates.test(notification.getNotificationJson());
   }
 
@@ -40,6 +41,11 @@ public class SingleSubscription implements Subscription {
     return subscriptionPredicates.hashCode();
   }
 
+  @Override
+  public String toString() {
+    return subscriptionPredicates.toString();
+  }
+
   public static class Builder {
 
     private ObjectPredicate subscriptionPredicates = new ObjectPredicate();
@@ -53,27 +59,31 @@ public class SingleSubscription implements Subscription {
       return subscriptionPredicates;
     }
 
-    public Builder addPredicate(ValuePredicate<? extends ValueNode> predicate, String... path) {
+    public Builder withPredicate(Predicate<?> predicate, String... path) {
+      if (path.length < 1) {
+        throw new IllegalArgumentException("Specified path must not be empty");
+      }
       List<String> _path = Arrays.asList(path);
       if (!pathsApplied.contains(_path)) {
         pathsApplied.add(_path);
       } else {
-        throw new IllegalArgumentException("Currently only supporting one predicate per json path");
+        throw new IllegalArgumentException("Currently only supporting one predicate per JSON path");
       }
       addPredicate(predicate, _path);
       return this;
     }
 
-    private void addPredicate(ValuePredicate<? extends ValueNode> predicate, List<String> path) {
+    private void addPredicate(Predicate<?> predicate, List<String> path) {
       ObjectPredicate curr = subscriptionPredicates;
-      for (int i = 0; i < path.size() - 1; i++) {
+      int i;
+      for (i = 0; i < path.size() - 1; i++) {
         String pathCurrPos = path.get(i);
         if (!curr.containsPredicateOnField(pathCurrPos)) {
           curr.addPredicate(pathCurrPos, new ObjectPredicate(pathCurrPos));
         }
         curr = (ObjectPredicate) curr.getPredicateOnField(pathCurrPos);
       }
-      curr.addPredicate(path.get(path.size() - 1), predicate);
+      curr.addPredicate(path.get(i), predicate);
     }
 
     public SingleSubscription build() {

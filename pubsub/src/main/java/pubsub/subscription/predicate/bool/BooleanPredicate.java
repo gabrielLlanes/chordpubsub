@@ -1,9 +1,12 @@
 package pubsub.subscription.predicate.bool;
 
-import com.fasterxml.jackson.databind.node.BooleanNode;
+import pubsub.subscription.predicate.Predicate;
+import pubsub.subscription.predicate.PredicateType;
 
-import pubsub.subscription.predicate.ValuePredicate;
+public abstract class BooleanPredicate extends Predicate<Boolean> {
 
-public abstract class BooleanPredicate implements ValuePredicate<BooleanNode> {
+  protected BooleanPredicate() {
+    super(PredicateType.BOOLEAN);
+  }
 
 }

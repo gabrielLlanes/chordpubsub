@@ -1,16 +1,15 @@
 package pubsub.subscription.predicate.number.lowerbound;
 
-import com.fasterxml.jackson.databind.node.IntNode;
+import pubsub.subscription.predicate.PredicateType;
 
-public class IntLowerBoundPredicate extends NumberLowerBoundPredicate<Integer, IntNode> {
+public class IntLowerBoundPredicate extends NumberLowerBoundPredicate<Integer> {
 
   public IntLowerBoundPredicate(int lowerBound, boolean inclusive) {
-    super(lowerBound, inclusive);
+    super(PredicateType.INT, lowerBound, inclusive);
   }
 
   @Override
-  public boolean test(IntNode jsonNode) {
-    int nodeVal = jsonNode.intValue();
-    return inclusive ? lowerBound <= nodeVal : lowerBound < nodeVal;
+  public boolean test(Integer value) {
+    return inclusive ? lowerBound <= value : lowerBound < value;
   }
 }

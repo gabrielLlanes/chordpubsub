@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import chord.util.ModuloInterval;
-import pubsub.notification.Notification;
 import pubsub.subscription.Subscription;
 
 /**
@@ -56,7 +55,7 @@ public interface RemotePubSubChordNode<T extends RemotePubSubChordNode<T>>
   /**
    * Notify this node that the parameter node is no longer a client
    * 
-   * @param client
+   * @param client the node that is not longer of this node
    */
   public void removeClient(T client) throws RemoteException;
 
@@ -110,20 +109,21 @@ public interface RemotePubSubChordNode<T extends RemotePubSubChordNode<T>>
   public T findPredecessor(int n) throws RemoteException;
 
   /**
-   * Publish a notification to this node using the multicast algorithm covered in
-   * the paper. This method should only be called if a node is calling this method
-   * on itself or if the notification matches the subscription of the graph edge
+   * Publish a notification to this node in the form of a serialized JSON string
+   * using the multicast algorithm covered in the paper. This method should only
+   * be called if a node is calling this method on itself or if the notification
+   * matches the subscription of the graph edge
    * 
-   * @param notification the notification to be published to this node
+   * @param notificationJsonString the notification to be published to this node
    */
-  public void publish(Notification notification, int publisherId, ModuloInterval range) throws RemoteException;
+  public void publish(String notificationJsonString, int publisherId, ModuloInterval range) throws RemoteException;
 
   /**
    * Tell this node to update the subscription of the edge connecting this
    * node with the caller, with the given subscription
    * 
    * @param subscription the subscription with which to update the graph edge
-   * @param the          id of the caller
+   * @param id           the id of the caller
    * @throws RemoteException
    */
   public void subscribe(Subscription subscription, int id) throws RemoteException;
@@ -133,8 +133,8 @@ public interface RemotePubSubChordNode<T extends RemotePubSubChordNode<T>>
   /**
    * Tell this node that the current subscription routing information is requested
    * 
-   * @param clientId
-   * @throws RemoteException
+   * @param clientId the id of the client node requesting the routing information
+   *                 update
    */
   public void updateSubscriptionEdge(int clientId) throws RemoteException;
 }

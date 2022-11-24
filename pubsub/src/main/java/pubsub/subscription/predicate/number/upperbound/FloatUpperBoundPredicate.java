@@ -1,17 +1,16 @@
 package pubsub.subscription.predicate.number.upperbound;
 
-import com.fasterxml.jackson.databind.node.FloatNode;
+import pubsub.subscription.predicate.PredicateType;
 
-public class FloatUpperBoundPredicate extends NumberUpperBoundPredicate<Float, FloatNode> {
+public class FloatUpperBoundPredicate extends NumberUpperBoundPredicate<Float> {
 
   public FloatUpperBoundPredicate(float upperBound, boolean inclusive) {
-    super(upperBound, inclusive);
+    super(PredicateType.FLOAT, upperBound, inclusive);
   }
 
   @Override
-  public boolean test(FloatNode jsonNode) {
-    float nodeVal = jsonNode.floatValue();
-    return inclusive ? upperBound >= nodeVal : upperBound > nodeVal;
+  public boolean test(Float value) {
+    return inclusive ? upperBound >= value : upperBound > value;
   }
 
 }

@@ -2,8 +2,6 @@ package pubsub.subscription.predicate.bool.equality;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.node.BooleanNode;
-
 import pubsub.subscription.predicate.bool.BooleanPredicate;
 
 public class BooleanEqualityPredicate extends BooleanPredicate {
@@ -19,8 +17,8 @@ public class BooleanEqualityPredicate extends BooleanPredicate {
   }
 
   @Override
-  public boolean test(BooleanNode jsonNode) {
-    return !(bool ^ jsonNode.booleanValue());
+  public boolean test(Boolean value) {
+    return !(bool ^ value.booleanValue());
   }
 
   @Override
@@ -36,5 +34,10 @@ public class BooleanEqualityPredicate extends BooleanPredicate {
     } catch (ClassCastException e) {
       return false;
     }
+  }
+
+  @Override
+  public String toString() {
+    return String.format("{predicate: boolean %s}", bool);
   }
 }

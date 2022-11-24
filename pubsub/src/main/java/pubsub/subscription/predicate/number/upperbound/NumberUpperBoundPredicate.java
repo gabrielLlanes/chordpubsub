@@ -2,22 +2,22 @@ package pubsub.subscription.predicate.number.upperbound;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.databind.node.NumericNode;
-
+import pubsub.subscription.predicate.PredicateType;
 import pubsub.subscription.predicate.number.NumberPredicate;
 
-public abstract class NumberUpperBoundPredicate<S extends Number, T extends NumericNode> extends NumberPredicate<S, T> {
+public abstract class NumberUpperBoundPredicate<T extends Number> extends NumberPredicate<T> {
 
-  protected final S upperBound;
+  protected final T upperBound;
 
   protected final boolean inclusive;
 
-  protected NumberUpperBoundPredicate(S upperBound, boolean inclusive) {
+  protected NumberUpperBoundPredicate(PredicateType predicateType, T upperBound, boolean inclusive) {
+    super(predicateType);
     this.upperBound = upperBound;
     this.inclusive = inclusive;
   }
 
-  public S getUpperBound() {
+  public T getUpperBound() {
     return upperBound;
   }
 
@@ -29,7 +29,7 @@ public abstract class NumberUpperBoundPredicate<S extends Number, T extends Nume
   @Override
   public boolean equals(Object obj) {
     try {
-      NumberUpperBoundPredicate<S, T> _obj = (NumberUpperBoundPredicate<S, T>) obj;
+      NumberUpperBoundPredicate<T> _obj = (NumberUpperBoundPredicate<T>) obj;
       return upperBound.equals(_obj.getUpperBound()) && (!(inclusive ^ _obj.isInclusive()));
     } catch (ClassCastException e) {
       return false;
