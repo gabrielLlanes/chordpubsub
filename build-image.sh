@@ -1,5 +1,3 @@
-#run in app directory
-cd ..
+#run in repo root directory
 ./gradlew :app:uberJar
-cd app
 docker build . --tag chordpubsubnode

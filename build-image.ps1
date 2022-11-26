@@ -1,5 +1,3 @@
-#run in app directory
-Set-Location ..
+#run in repo root directory
 ./gradlew :app:uberJar
-Set-Location app
 docker build . --tag chordpubsubnode

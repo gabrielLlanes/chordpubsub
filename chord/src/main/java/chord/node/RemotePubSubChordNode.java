@@ -22,7 +22,6 @@ public interface RemotePubSubChordNode<T extends RemotePubSubChordNode<T>>
   /**
    * 
    * @return the id of this node within the chord network
-   * @throws RemoteException
    */
   public int getId() throws RemoteException;
 
@@ -124,7 +123,6 @@ public interface RemotePubSubChordNode<T extends RemotePubSubChordNode<T>>
    * 
    * @param subscription the subscription with which to update the graph edge
    * @param id           the id of the caller
-   * @throws RemoteException
    */
   public void subscribe(Subscription subscription, int id) throws RemoteException;
 

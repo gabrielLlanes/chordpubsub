@@ -252,7 +252,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     if (loopBackSubscription != null && loopBackSubscription.matches(notification)) {
       notificationQueue.offer(notification);
     } else if (loopBackSubscription != null && !loopBackSubscription.matches(notification)) {
-      log.log(Level.INFO, "DID NOT MATCH: {0} AND {1}\n", notificationJsonString, loopBackSubscription);
+      log.log(Level.DEBUG, "DID NOT MATCH: {0} AND {1}\n", notificationJsonString, loopBackSubscription);
     }
     Set<Integer> tested = new HashSet<>();
     for (int i = 1; i <= fingerTable.size(); i++) {
@@ -267,7 +267,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
         if (subscriptions != null && subscriptions.matches(notification)) {
           T fingerTableIthNode = fingerTable.getNode(i);
           int intersectionIntervalRight = modulo.inClosed(assigned.b, range) ? assigned.b : range.b;
-          log.log(Level.INFO, "Notification publishing by {0} to {1}. Initial Interval is {2}\n", getId(),
+          log.log(Level.DEBUG, "Notification publishing by {0} to {1}. Initial Interval is {2}\n", getId(),
               fingerTableIthId, modulo.interval(assigned.a, intersectionIntervalRight));
           fingerTableIthNode.publish(notificationJsonString, getId(),
               modulo.interval(assigned.a, intersectionIntervalRight));
@@ -290,7 +290,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
       }
       publishedTo.add(currNodeId);
       ModuloInterval intervalAssignedToEntry = fingerTable.assignedToEntry(i);
-      log.log(Level.INFO,
+      log.log(Level.DEBUG,
           "Notification publishing by {0} to {1}. Initial Interval is {2}\n", getId(), currNodeId,
           intervalAssignedToEntry);
       fingerTable.getNode(i).publish(notification.notificationJsonString(), getId(), intervalAssignedToEntry);
