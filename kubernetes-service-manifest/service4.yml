@@ -5,7 +5,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: node-4-pod
+    app: node4-pod
   ports:
     - name: port-8080
       port: 8080

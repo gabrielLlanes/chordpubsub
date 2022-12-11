@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node1-config
+data:
+  CHORD_DEGREE: "12"
+  CHORD_HOSTNAME: node1
+  CHORD_FIRST_NODE: "true"
+  RMI_PORT: "1099"

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: node3-deployment
+  name: node3-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node3-pod
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: node3-pod
+    spec:
+      volumes:
+        - name: my-disk
+          emptyDir: {}
+      containers:
+        - image: docker.io/asmiwdtc/chordpubsubnode
+          imagePullPolicy: Always
+          name: node3-container
+          command: ["java", "-jar", "/app/app.jar"]
+          envFrom:
+            - configMapRef:
+                name: node3-config
+                optional: false
+          volumeMounts:
+            - name: my-disk
+              mountPath: /my-data
+          resources: {}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+status: {}

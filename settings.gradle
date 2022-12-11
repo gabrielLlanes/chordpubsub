@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'pubsubschord'
-include('app', 'chord', 'pubsub')
+include('app', 'chord', 'pubsub', 'peerservice')

@@ -146,6 +146,7 @@ public class Notification implements java.io.Serializable {
     }
 
     public Notification build() {
+      put(System.currentTimeMillis(), "timestamp");
       return new Notification(notificationJson);
     }
 
