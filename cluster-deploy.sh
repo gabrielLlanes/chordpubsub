@@ -1,0 +1,1 @@
+kubectl apply -f kubernetes-pod-manifest --recursive

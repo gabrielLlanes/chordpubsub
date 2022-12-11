@@ -11,12 +11,12 @@ public class ConsistentFingerPubSubChordNodeImpl
     extends AbstractPubSubChordNode<ConsistentFingerRemotePubSubChordNode>
     implements ConsistentFingerRemotePubSubChordNode, ConsistentFingerPubSubChordNode {
 
-  public ConsistentFingerPubSubChordNodeImpl(int degree, int id) throws RemoteException {
-    super(degree, id);
-  }
-
   public ConsistentFingerPubSubChordNodeImpl(int degree, int id, boolean initial) throws RemoteException {
     super(degree, id, initial);
+  }
+
+  public ConsistentFingerPubSubChordNodeImpl(int degree, int id, int port, boolean initial) throws RemoteException {
+    super(degree, id, port, initial);
   }
 
   @Override

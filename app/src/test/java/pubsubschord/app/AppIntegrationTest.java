@@ -29,13 +29,13 @@ public class AppIntegrationTest {
     ExecutorService pool = Executors.newFixedThreadPool(32);
 
     ConsistentFingerPubSubChordNodeImpl n1 = new ConsistentFingerPubSubChordNodeImpl(10, 3, true);
-    ConsistentFingerPubSubChordNodeImpl n2 = new ConsistentFingerPubSubChordNodeImpl(10, 47);
-    ConsistentFingerPubSubChordNodeImpl n3 = new ConsistentFingerPubSubChordNodeImpl(10, 98);
-    ConsistentFingerPubSubChordNodeImpl n4 = new ConsistentFingerPubSubChordNodeImpl(10, 298);
-    ConsistentFingerPubSubChordNodeImpl n5 = new ConsistentFingerPubSubChordNodeImpl(10, 343);
-    ConsistentFingerPubSubChordNodeImpl n6 = new ConsistentFingerPubSubChordNodeImpl(10, 467);
-    ConsistentFingerPubSubChordNodeImpl n7 = new ConsistentFingerPubSubChordNodeImpl(10, 557);
-    ConsistentFingerPubSubChordNodeImpl n8 = new ConsistentFingerPubSubChordNodeImpl(10, 876);
+    ConsistentFingerPubSubChordNodeImpl n2 = new ConsistentFingerPubSubChordNodeImpl(10, 47, false);
+    ConsistentFingerPubSubChordNodeImpl n3 = new ConsistentFingerPubSubChordNodeImpl(10, 98, false);
+    ConsistentFingerPubSubChordNodeImpl n4 = new ConsistentFingerPubSubChordNodeImpl(10, 298, false);
+    ConsistentFingerPubSubChordNodeImpl n5 = new ConsistentFingerPubSubChordNodeImpl(10, 343, false);
+    ConsistentFingerPubSubChordNodeImpl n6 = new ConsistentFingerPubSubChordNodeImpl(10, 467, false);
+    ConsistentFingerPubSubChordNodeImpl n7 = new ConsistentFingerPubSubChordNodeImpl(10, 557, false);
+    ConsistentFingerPubSubChordNodeImpl n8 = new ConsistentFingerPubSubChordNodeImpl(10, 876, false);
 
     ReentrantLock lock = new ReentrantLock();
 
@@ -213,22 +213,31 @@ public class AppIntegrationTest {
     Condition allPublishedCondition = publish.newCondition();
     AtomicInteger publishedCount = new AtomicInteger(0);
 
-    int notificationsToPublish = 256;
+    ConsistentFingerPubSubChordNodeImpl[] nodes = {
+        n1, n2, n3, n4, n5, n6, n7, n8
+    };
 
-    for (int i = 0; i < notificationsToPublish; i++) {
-      pool.execute(() -> {
-        try {
-          n1.publish(notification);
-          publish.lock();
-          if (publishedCount.incrementAndGet() == notificationsToPublish) {
-            allPublishedCondition.signal();
+    int multiplier = 100;
+
+    int notificationsToPublish = 8 * multiplier;
+
+    for (AtomicInteger i = new AtomicInteger(0); i.get() < nodes.length; i.incrementAndGet()) {
+      int nodeIndex = i.get();
+      for (int j = 0; j < notificationsToPublish / 8; j++) {
+        pool.execute(() -> {
+          try {
+            nodes[nodeIndex].publish(notification);
+            publish.lock();
+            if (publishedCount.incrementAndGet() == notificationsToPublish) {
+              allPublishedCondition.signal();
+            }
+            publish.unlock();
+          } catch (RemoteException e) {
+            e.printStackTrace();
+            System.exit(1);
           }
-          publish.unlock();
-        } catch (RemoteException e) {
-          e.printStackTrace();
-          System.exit(1);
-        }
-      });
+        });
+      }
     }
 
     publish.lock();
@@ -248,12 +257,12 @@ public class AppIntegrationTest {
     ConcurrentLinkedQueue<Notification> q7 = n7.getNotificationQueue();
     ConcurrentLinkedQueue<Notification> q8 = n8.getNotificationQueue();
 
-    assertEquals(notificationsToPublish, q2.size());
-    assertEquals(notificationsToPublish, q3.size());
-    assertEquals(notificationsToPublish, q4.size());
-    assertEquals(notificationsToPublish, q5.size());
-    assertEquals(notificationsToPublish, q6.size());
-    assertEquals(notificationsToPublish, q7.size());
-    assertEquals(notificationsToPublish, q8.size());
+    assertEquals(7 * multiplier, q2.size());
+    assertEquals(7 * multiplier, q3.size());
+    assertEquals(7 * multiplier, q4.size());
+    assertEquals(7 * multiplier, q5.size());
+    assertEquals(7 * multiplier, q6.size());
+    assertEquals(7 * multiplier, q7.size());
+    assertEquals(7 * multiplier, q8.size());
   }
 }

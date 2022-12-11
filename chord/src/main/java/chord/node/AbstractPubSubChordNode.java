@@ -50,10 +50,10 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    * subscription updates are not expected to be frequent.
    */
   private static final String lockName = "LOCK";
-  private static final Config config = new Config();
-  private static final HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
-  private static final CPSubsystem cpSubsystem = instance.getCPSubsystem();
-  protected static final FencedLock lock = cpSubsystem.getLock(lockName);
+  private Config config = new Config();
+  private HazelcastInstance instance;
+  private CPSubsystem cpSubsystem;
+  protected FencedLock lock;
 
   /* the identifier of this node in the chord network */
   protected final int id;
@@ -88,23 +88,39 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    * A queue in which to store all notifications that match the loopback
    * subscription, for receipt by an outside application.
    */
-  transient public ConcurrentLinkedQueue<Notification> notificationQueue = new ConcurrentLinkedQueue<>();
+  transient private ConcurrentLinkedQueue<Notification> notificationQueue = new ConcurrentLinkedQueue<>();
 
   /**
    * utility for arithmetic modulo the modulus
    */
   transient protected final Modulo modulo;
 
-  protected AbstractPubSubChordNode(int degree, int id) throws RemoteException {
+  private void hazelcastConfig() {
+    config.getCPSubsystemConfig().setCPMemberCount(3);
+    instance = Hazelcast.newHazelcastInstance(config);
+    cpSubsystem = instance.getCPSubsystem();
+    lock = cpSubsystem.getLock(lockName);
+  }
+
+  protected AbstractPubSubChordNode(int degree, int id, boolean initial) throws RemoteException {
+    super(1099);
+    hazelcastConfig();
     this.degree = degree;
     int modulus = Util.powerOf2(degree);
     this.modulus = modulus;
     this.modulo = new Modulo(modulus);
     this.id = modulo.mod(id);
     this.fingerTable = new FingerTableImpl<>(degree, this.id);
+    if (initial) {
+      for (int i = 0; i <= degree; i++) {
+        fingerTable.set(i, this.id, self());
+      }
+    }
   }
 
-  protected AbstractPubSubChordNode(int degree, int id, boolean initial) throws RemoteException {
+  protected AbstractPubSubChordNode(int degree, int id, int port, boolean initial) throws RemoteException {
+    super(port);
+    hazelcastConfig();
     this.degree = degree;
     int modulus = Util.powerOf2(degree);
     this.modulus = modulus;

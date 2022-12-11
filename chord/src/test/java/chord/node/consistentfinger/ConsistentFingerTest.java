@@ -21,7 +21,7 @@ public class ConsistentFingerTest {
   @Test
   public void testTwoNodes() throws RemoteException {
     ConsistentFingerPubSubChordNodeImpl c1 = new ConsistentFingerPubSubChordNodeImpl(8, 1, true);
-    ConsistentFingerPubSubChordNodeImpl c197 = new ConsistentFingerPubSubChordNodeImpl(8, 197);
+    ConsistentFingerPubSubChordNodeImpl c197 = new ConsistentFingerPubSubChordNodeImpl(8, 197, false);
     c197.join(c1);
 
     Subscription subscription = new SingleSubscription.Builder()
@@ -52,14 +52,14 @@ public class ConsistentFingerTest {
   public void testPublishLocationIndependence() throws RemoteException {
 
     ConsistentFingerRemotePubSubChordNode c1 = new ConsistentFingerPubSubChordNodeImpl(5, 1, true);
-    ConsistentFingerPubSubChordNodeImpl c4 = new ConsistentFingerPubSubChordNodeImpl(5, 4);
-    ConsistentFingerPubSubChordNodeImpl c9 = new ConsistentFingerPubSubChordNodeImpl(5, 9);
-    ConsistentFingerPubSubChordNodeImpl c11 = new ConsistentFingerPubSubChordNodeImpl(5, 11);
-    ConsistentFingerPubSubChordNodeImpl c14 = new ConsistentFingerPubSubChordNodeImpl(5, 14);
-    ConsistentFingerPubSubChordNodeImpl c18 = new ConsistentFingerPubSubChordNodeImpl(5, 18);
-    ConsistentFingerPubSubChordNodeImpl c20 = new ConsistentFingerPubSubChordNodeImpl(5, 20);
-    ConsistentFingerPubSubChordNodeImpl c21 = new ConsistentFingerPubSubChordNodeImpl(5, 21);
-    ConsistentFingerPubSubChordNodeImpl c28 = new ConsistentFingerPubSubChordNodeImpl(5, 28);
+    ConsistentFingerPubSubChordNodeImpl c4 = new ConsistentFingerPubSubChordNodeImpl(5, 4, false);
+    ConsistentFingerPubSubChordNodeImpl c9 = new ConsistentFingerPubSubChordNodeImpl(5, 9, false);
+    ConsistentFingerPubSubChordNodeImpl c11 = new ConsistentFingerPubSubChordNodeImpl(5, 11, false);
+    ConsistentFingerPubSubChordNodeImpl c14 = new ConsistentFingerPubSubChordNodeImpl(5, 14, false);
+    ConsistentFingerPubSubChordNodeImpl c18 = new ConsistentFingerPubSubChordNodeImpl(5, 18, false);
+    ConsistentFingerPubSubChordNodeImpl c20 = new ConsistentFingerPubSubChordNodeImpl(5, 20, false);
+    ConsistentFingerPubSubChordNodeImpl c21 = new ConsistentFingerPubSubChordNodeImpl(5, 21, false);
+    ConsistentFingerPubSubChordNodeImpl c28 = new ConsistentFingerPubSubChordNodeImpl(5, 28, false);
 
     c4.join(c1);
     c28.join(c4);

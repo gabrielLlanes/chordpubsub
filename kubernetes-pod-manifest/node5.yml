@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: node5
+    app: node-5-pod
+  name: node-5-pod
+spec:
+  volumes:
+    - name: my-disk
+      emptyDir: {}
+  containers:
+    - image: docker.io/asmiwdtc/chordpubsubnode
+      imagePullPolicy: Always
+      name: node-5-pod-container
+      command: ["java", "-jar", "/app/app.jar"]
+      env:
+        - name: CHORD_DEGREE
+          value: "12"
+        - name: CHORD_HOSTNAME
+          value: "node5"
+        - name: CHORD_FIRST_NODE
+          value: "false"
+        - name: RMI_PORT
+          value: "1099"
+        - name: CHORD_JOIN_NODE_HOSTNAME
+          value: "node4"
+        - name: CHORD_JOIN_NODE_PORT
+          value: "1099"
+      volumeMounts:
+        - name: my-disk
+          mountPath: /my-data
+      resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
