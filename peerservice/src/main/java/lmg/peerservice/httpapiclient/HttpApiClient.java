@@ -1,47 +1,67 @@
 package lmg.peerservice.httpapiclient;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lmg.peerservice.service.PeerService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pubsub.notification.Notification;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Service
-public class HttpApiClient implements Runnable {
+public class HttpApiClient {
 
-    @Autowired
-    private Environment env;
+    private final PeerService peerService;
 
-    @Value("${http.request.period}")
-    private String _fixedPeriod;
+    private final String notificationName = System.getenv("NOTIFICATION_NAME");
 
-    private int fixedPeriod;
 
-    private String httpRequestString;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final HttpRequest httpRequest;
 
-    @Value("${notification.name}")
-    private String notificationName;
+    private final String httpRequestString;
 
-    private final ScheduledExecutorService httpRequestThread = Executors.newSingleThreadScheduledExecutor();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public HttpApiClient() {
-        System.out.println(env);
-        System.out.println(_fixedPeriod);
-        System.out.println(httpRequestString);
-        System.out.println(notificationName);
-        try {
-            httpRequestString = System.getenv("HTTP_REQUEST_STRING");
-            fixedPeriod = Integer.parseInt(_fixedPeriod);
-            notificationName = System.getenv("NOTIFICATION_NAME");
-        } catch(Exception e) {
-            System.exit(1);
+
+    public HttpApiClient(PeerService peerService) throws IOException, URISyntaxException {
+        this.peerService = peerService;
+        String httpRequestStringFileLocation = System.getenv("HTTP_REQUEST_FILE_LOCATION");
+        if(httpRequestStringFileLocation != null) {
+            httpRequestString = new String(Files.readAllBytes(Path.of(httpRequestStringFileLocation)));
+        } else {
+            httpRequestString = null;
         }
+        httpRequest = HttpRequest.newBuilder(new URI(httpRequestString))
+                .GET()
+                .build();
     }
 
-    @Override
-    public void run() {
-        //httpRequestThread.scheduleWithFixedDelay(()->)
+    @Scheduled(fixedDelay = 20_000)
+    private void request() {
+        if(httpRequestString == null) {
+            return;
+        }
+        try {
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            if(response.statusCode() == 200) {
+                System.out.println(response.body());
+                Notification notification = new Notification.Builder()
+                        ._put(notificationName, "notificationName")
+                        .put(objectMapper.readTree(response.body()), "data")
+                        .build();
+                if(peerService != null) {
+                    peerService.accept(notification);
+                }
+            }
+        } catch(IOException | InterruptedException e) {
+        }
     }
 }

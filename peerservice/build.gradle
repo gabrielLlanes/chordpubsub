@@ -15,12 +15,32 @@ repositories {
 dependencies {
 	implementation project(':app')
 	implementation project(':pubsub')
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	//implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
+}
+
+tasks.register('uberJar', Jar) {
+	archiveClassifier = 'uber'
+
+	manifest {
+		attributes(
+				'Main-Class': 'lmg.peerservice.PeerServiceApplication'
+		)
+	}
+
+	from sourceSets.main.output
+
+	dependsOn configurations.runtimeClasspath
+	from {
+		configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+	}
+
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	archiveBaseName = 'peerservice'
 }
 
 tasks.named('test') {

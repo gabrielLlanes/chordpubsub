@@ -30,8 +30,8 @@ public class ConsistentFingerTest {
         .build();
 
     Notification notification = new Notification.Builder()
-        .put(8999.123, "a")
-        .put("desiredvalue", "b")
+        ._put(8999.123, "a")
+        ._put("desiredvalue", "b")
         .build();
 
     c1.subscribe(subscription);
@@ -80,9 +80,9 @@ public class ConsistentFingerTest {
     c9.join(c28);
 
     Notification notification = new Notification.Builder()
-        .put("fdsasecondfdsa", "a", "aa")
-        .put(-499, "b", "ba", "baa")
-        .put(false, "c", "cb", "us")
+        ._put("fdsasecondfdsa", "a", "aa")
+        ._put(-499, "b", "ba", "baa")
+        ._put(false, "c", "cb", "us")
         .build();
 
     c28.publish(notification);

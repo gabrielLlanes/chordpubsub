@@ -13,20 +13,6 @@ dependencies {
     implementation project(':pubsub')
 }
 
-// jar {
-//     manifest {
-//         attributes(
-//             'Main-Class': 'pubsubschord.app.App'
-//         )
-//     }
-//         //use fat jar with dependencies
-//     from {
-//         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-//     }
-//     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//     archiveBaseName = 'chordpubsubnode'
-// }
-
 tasks.register('uberJar', Jar) {
     archiveClassifier = 'uber'
 

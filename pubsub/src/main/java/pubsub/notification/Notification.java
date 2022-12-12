@@ -76,45 +76,59 @@ public class Notification implements java.io.Serializable {
     public Builder() {
     }
 
-    public Builder put(boolean b, String... path) {
+    public Builder _put(boolean b, String... path) {
       verifyPositivePathLength(path);
       verifyPathNotAlreadyApplied(path);
-      put(BooleanNode.valueOf(b), path);
+      _put(BooleanNode.valueOf(b), path);
       return this;
     }
 
-    public Builder put(int n, String... path) {
+    public Builder _put(int n, String... path) {
       verifyPositivePathLength(path);
       verifyPathNotAlreadyApplied(path);
-      put(IntNode.valueOf(n), path);
+      _put(IntNode.valueOf(n), path);
       return this;
     }
 
-    public Builder put(long n, String... path) {
+    public Builder _put(long n, String... path) {
       verifyPositivePathLength(path);
       verifyPathNotAlreadyApplied(path);
-      put(LongNode.valueOf(n), path);
+      _put(LongNode.valueOf(n), path);
       return this;
     }
 
-    public Builder put(float x, String... path) {
+    public Builder _put(float x, String... path) {
       verifyPositivePathLength(path);
       verifyPathNotAlreadyApplied(path);
-      put(FloatNode.valueOf(x), path);
+      _put(FloatNode.valueOf(x), path);
       return this;
     }
 
-    public Builder put(double x, String... path) {
+    public Builder _put(double x, String... path) {
       verifyPositivePathLength(path);
       verifyPathNotAlreadyApplied(path);
-      put(DoubleNode.valueOf(x), path);
+      _put(DoubleNode.valueOf(x), path);
       return this;
     }
 
-    public Builder put(String s, String... path) {
+    public Builder _put(String s, String... path) {
       verifyPositivePathLength(path);
       verifyPathNotAlreadyApplied(path);
-      put(TextNode.valueOf(s), path);
+      _put(TextNode.valueOf(s), path);
+      return this;
+    }
+
+    public Builder _put(ObjectNode objectNode, String... path) {
+      verifyPositivePathLength(path);
+      verifyPathNotAlreadyApplied(path);
+      _put(objectNode, path);
+      return this;
+    }
+
+    public Builder put(JsonNode jsonNode, String... path) {
+      verifyPositivePathLength(path);
+      verifyPathNotAlreadyApplied(path);
+      _put(jsonNode, path);
       return this;
     }
 
@@ -132,7 +146,7 @@ public class Notification implements java.io.Serializable {
       }
     }
 
-    private void put(JsonNode jsonNode, String[] path) {
+    private void _put(JsonNode jsonNode, String[] path) {
       ObjectNode curr = notificationJson;
       int i;
       for (i = 0; i < path.length - 1; i++) {
@@ -146,7 +160,7 @@ public class Notification implements java.io.Serializable {
     }
 
     public Notification build() {
-      put(System.currentTimeMillis(), "timestamp");
+      _put(System.currentTimeMillis(), "timestamp");
       return new Notification(notificationJson);
     }
 

@@ -36,11 +36,11 @@ public class MatchingTest {
         .build();
 
     Notification notification = new Notification.Builder()
-        .put(150, "a")
-        .put(true, "b")
-        .put("this is a string", "c")
-        .put(1234.567, "d", "e", "f", "g")
-        .put(746f, "h", "i")
+        ._put(150, "a")
+        ._put(true, "b")
+        ._put("this is a string", "c")
+        ._put(1234.567, "d", "e", "f", "g")
+        ._put(746f, "h", "i")
         .build();
 
     assertTrue(subscription.matches(notification));
@@ -55,9 +55,9 @@ public class MatchingTest {
         .build();
 
     Notification notification = new Notification.Builder()
-        .put("fdsasecondfdsa", "a", "aa")
-        .put(345.75, "b", "ba", "baa")
-        .put("false", "c", "cb", "us")
+        ._put("fdsasecondfdsa", "a", "aa")
+        ._put(345.75, "b", "ba", "baa")
+        ._put("false", "c", "cb", "us")
         .build();
 
     assertFalse(subscription.matches(notification));

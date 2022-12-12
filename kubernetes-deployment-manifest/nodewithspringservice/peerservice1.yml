@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: node1-deployment
+  name: node1-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node1-pod
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: node1-pod
+    spec:
+      volumes:
+        - name: my-disk
+          emptyDir: {}
+        - name: http-request-uri
+          secret:
+            secretName: http-request-uri-node1
+            items:
+              - key: http-request-uri
+                path: http-request-uri
+      containers:
+        - image: docker.io/asmiwdtc/peerservice
+          imagePullPolicy: Always
+          name: node1-container
+          command: ["java", "-jar", "/app/app.jar"]
+          envFrom:
+            - configMapRef:
+                name: node1-config
+                optional: false
+          volumeMounts:
+            - name: my-disk
+              mountPath: /my-data
+            - name: http-request-uri
+              mountPath: /my-config
+          resources: {}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+status: {}

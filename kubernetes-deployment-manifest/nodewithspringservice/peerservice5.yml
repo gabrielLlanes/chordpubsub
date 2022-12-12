@@ -3,35 +3,43 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    app: node1-deployment
-  name: node1-deployment
+    app: node5-deployment
+  name: node5-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: node1-pod
+      app: node5-pod
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: node1-pod
+        app: node5-pod
     spec:
       volumes:
         - name: my-disk
           emptyDir: {}
+        - name: http-request-uri
+          secret:
+            secretName: http-request-uri-node5
+            items:
+              - key: http-request-uri
+                path: http-request-uri
       containers:
-        - image: docker.io/asmiwdtc/chordpubsubnode
+        - image: docker.io/asmiwdtc/peerservice
           imagePullPolicy: Always
-          name: node1-container
+          name: node5-container
           command: ["java", "-jar", "/app/app.jar"]
           envFrom:
             - configMapRef:
-                name: node1-config
+                name: node5-config
                 optional: false
           volumeMounts:
             - name: my-disk
               mountPath: /my-data
+            - name: http-request-uri
+              mountPath: /my-config
           resources: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Always

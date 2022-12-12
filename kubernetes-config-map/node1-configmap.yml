@@ -7,3 +7,5 @@ data:
   CHORD_HOSTNAME: node1
   CHORD_FIRST_NODE: "true"
   RMI_PORT: "1099"
+  NOTIFICATION_NAME: eth_price
+  HTTP_REQUEST_FILE_LOCATION: "/my-config/http-request-uri"

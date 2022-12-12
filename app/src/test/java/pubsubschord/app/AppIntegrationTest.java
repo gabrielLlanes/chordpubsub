@@ -195,9 +195,9 @@ public class AppIntegrationTest {
     });
 
     Notification notification = new Notification.Builder()
-        .put("fdsasecondfdsa", "a", "aa")
-        .put(-499, "b", "ba", "baa")
-        .put(false, "c", "cb", "us")
+        ._put("fdsasecondfdsa", "a", "aa")
+        ._put(-499, "b", "ba", "baa")
+        ._put(false, "c", "cb", "us")
         .build();
 
     lock.lock();

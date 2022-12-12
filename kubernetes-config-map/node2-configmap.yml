@@ -9,3 +9,5 @@ data:
   RMI_PORT: "1099"
   CHORD_JOIN_NODE_HOSTNAME: node1
   CHORD_JOIN_NODE_PORT: "1099"
+  NOTIFICATION_NAME: btc_price
+  HTTP_REQUEST_FILE_LOCATION: "/my-config/http-request-uri"

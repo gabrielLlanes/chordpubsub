@@ -267,6 +267,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     }
     if (loopBackSubscription != null && loopBackSubscription.matches(notification)) {
       notificationQueue.offer(notification);
+      log.log(Level.INFO, "Subscription matched notification: {0}\n", notification.notificationJsonString());
     } else if (loopBackSubscription != null && !loopBackSubscription.matches(notification)) {
       log.log(Level.DEBUG, "DID NOT MATCH: {0} AND {1}\n", notificationJsonString, loopBackSubscription);
     }
