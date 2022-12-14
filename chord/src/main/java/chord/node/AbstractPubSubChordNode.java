@@ -83,7 +83,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    * Loopback subscription that represents the subscriptions of this node. Always
    * matched against a notification that is published to this node.
    */
-  transient private Subscription loopBackSubscription;
+  transient private DisjunctionSubscription loopBackSubscription;
 
   /*
    * A queue in which to store all notifications that match the loopback
@@ -378,10 +378,15 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    */
   public void subscribe(Subscription subscription) throws RemoteException {
     lock.lock();
-    loopBackSubscription = subscription;
+    if(loopBackSubscription == null) {
+      loopBackSubscription = new DisjunctionSubscription(subscription);
+    } else {
+      loopBackSubscription.addSubscription(subscription);
+    }
+    //loopBackSubscription = subscription;
     for (T client : clients) {
       if (client.getId() != getId()) {
-        client.subscribe(subscription, id);
+        client.subscribe(loopBackSubscription, id);
       }
     }
     lock.unlock();

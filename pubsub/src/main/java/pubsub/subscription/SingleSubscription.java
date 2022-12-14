@@ -6,7 +6,7 @@ import pubsub.notification.Notification;
 import pubsub.subscription.predicate.Predicate;
 import pubsub.subscription.predicate.object.ObjectPredicate;
 
-public class SingleSubscription implements Subscription {
+public class SingleSubscription extends Subscription {
 
   /**
    * subscription predicates on the root object node of a notification
@@ -17,6 +17,10 @@ public class SingleSubscription implements Subscription {
 
   private SingleSubscription(Builder builder) {
     this.subscriptionPredicates = builder.getSubscriptionPredicates();
+  }
+
+  public UUID getId() {
+    return id;
   }
 
   @Override
@@ -32,12 +36,13 @@ public class SingleSubscription implements Subscription {
     if (!(obj instanceof SingleSubscription)) {
       return false;
     }
-    return this.subscriptionPredicates.equals(((SingleSubscription) obj).subscriptionPredicates);
+    SingleSubscription subscription = (SingleSubscription) obj;
+    return id.equals(subscription.getId()) && subscriptionPredicates.equals(subscription.subscriptionPredicates);
   }
 
   @Override
   public int hashCode() {
-    return subscriptionPredicates.hashCode();
+    return id.hashCode();
   }
 
   @Override

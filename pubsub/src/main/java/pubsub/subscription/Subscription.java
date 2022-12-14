@@ -2,8 +2,10 @@ package pubsub.subscription;
 
 import pubsub.notification.Notification;
 
-public interface Subscription extends java.io.Serializable {
+import java.util.UUID;
 
-  public boolean matches(Notification notification);
+public abstract class Subscription implements java.io.Serializable {
+
+  public abstract boolean matches(Notification notification);
 
 }

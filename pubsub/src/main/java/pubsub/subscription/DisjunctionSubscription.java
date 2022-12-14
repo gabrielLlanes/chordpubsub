@@ -5,7 +5,7 @@ import java.util.Set;
 
 import pubsub.notification.Notification;
 
-public class DisjunctionSubscription implements Subscription {
+public class DisjunctionSubscription extends Subscription {
 
   private Set<Subscription> subscriptions;
 
@@ -17,7 +17,7 @@ public class DisjunctionSubscription implements Subscription {
     this.subscriptions = new HashSet<>();
     for (Subscription subscription : subscriptions) {
       if (subscription != null)
-        this.subscriptions.add(subscription);
+        addSubscription(subscription);
     }
   }
 
@@ -29,13 +29,20 @@ public class DisjunctionSubscription implements Subscription {
     this.subscriptions = new HashSet<>();
   }
 
+  public Set<Subscription> getSubscriptions() {
+    return subscriptions;
+  }
+
   public void addSubscription(Subscription subscription) {
     if (subscription instanceof DisjunctionSubscription) {
-      if (((DisjunctionSubscription) subscription).subscriptions.size() == 0) {
-        return;
+      for(Subscription _subscription: ((DisjunctionSubscription) subscription).getSubscriptions()) {
+        addSubscription(_subscription);
+      }
+    } else if(subscription instanceof SingleSubscription) {
+      if(!subscriptions.contains(subscription)) {
+        subscriptions.add(subscription);
       }
     }
-    subscriptions.add(subscription);
   }
 
   public void removeSubscription(Subscription subscription) {
