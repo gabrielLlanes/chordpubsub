@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'pubsubschord'
-include('app', 'chord', 'pubsub', 'peerservice')
+include('nodeproxy', 'chord', 'pubsub', 'peerservice', 'backend')

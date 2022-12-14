@@ -19,7 +19,7 @@ public class ServiceRestController {
   }
 
   @GetMapping("/peer/recent")
-  public List<Notification> mostRecentNotifications() {
+  public List<String> mostRecentNotifications() {
     return peerService.mostRecentNotifications();
   }
 

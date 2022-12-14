@@ -1,8 +1,7 @@
-package pubsubschord.app;
+package pubsubschord.nodeproxy;
 
 import java.lang.System.Logger;
 import java.rmi.RemoteException;
-import java.util.Map;
 
 public class App {
 

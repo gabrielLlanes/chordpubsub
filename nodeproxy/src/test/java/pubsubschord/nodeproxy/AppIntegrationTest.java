@@ -1,11 +1,9 @@
-package pubsubschord.app;
+package pubsubschord.nodeproxy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.rmi.RemoteException;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
@@ -249,13 +247,13 @@ public class AppIntegrationTest {
     }
     publish.unlock();
 
-    ConcurrentLinkedQueue<Notification> q2 = n2.getNotificationQueue();
-    ConcurrentLinkedQueue<Notification> q3 = n3.getNotificationQueue();
-    ConcurrentLinkedQueue<Notification> q4 = n4.getNotificationQueue();
-    ConcurrentLinkedQueue<Notification> q5 = n5.getNotificationQueue();
-    ConcurrentLinkedQueue<Notification> q6 = n6.getNotificationQueue();
-    ConcurrentLinkedQueue<Notification> q7 = n7.getNotificationQueue();
-    ConcurrentLinkedQueue<Notification> q8 = n8.getNotificationQueue();
+    LinkedBlockingQueue<Notification> q2 = n2.getNotificationQueue();
+    LinkedBlockingQueue<Notification> q3 = n3.getNotificationQueue();
+    LinkedBlockingQueue<Notification> q4 = n4.getNotificationQueue();
+    LinkedBlockingQueue<Notification> q5 = n5.getNotificationQueue();
+    LinkedBlockingQueue<Notification> q6 = n6.getNotificationQueue();
+    LinkedBlockingQueue<Notification> q7 = n7.getNotificationQueue();
+    LinkedBlockingQueue<Notification> q8 = n8.getNotificationQueue();
 
     assertEquals(7 * multiplier, q2.size());
     assertEquals(7 * multiplier, q3.size());

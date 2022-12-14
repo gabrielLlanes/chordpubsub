@@ -1,9 +1,6 @@
 package pubsub.subscription;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import pubsub.notification.Notification;
 import pubsub.subscription.predicate.Predicate;
@@ -15,6 +12,8 @@ public class SingleSubscription implements Subscription {
    * subscription predicates on the root object node of a notification
    */
   private final ObjectPredicate subscriptionPredicates;
+
+  private final UUID id = UUID.randomUUID();
 
   private SingleSubscription(Builder builder) {
     this.subscriptionPredicates = builder.getSubscriptionPredicates();

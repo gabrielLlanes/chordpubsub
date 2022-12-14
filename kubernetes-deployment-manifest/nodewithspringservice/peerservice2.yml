@@ -22,10 +22,22 @@ spec:
           emptyDir: {}
         - name: http-request-uri
           secret:
-            secretName: http-request-uri-node2
+            secretName: http-request-uri
             items:
-              - key: http-request-uri
+              - key: http-request-uri-node2
                 path: http-request-uri
+        - name: database-config
+          secret:
+            secretName: dbinfo
+            items:
+              - key: db-url
+                path: db-url
+              - key: db-username
+                path: db-username
+              - key: db-password
+                path: db-password
+              - key: table-node2
+                path: db-table
       containers:
         - image: docker.io/asmiwdtc/peerservice
           imagePullPolicy: Always
@@ -40,6 +52,8 @@ spec:
               mountPath: /my-data
             - name: http-request-uri
               mountPath: /my-config
+            - name: database-config
+              mountPath: /db-config
           resources: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Always

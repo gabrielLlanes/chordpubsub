@@ -5,14 +5,12 @@ import pubsub.notification.Notification;
 import pubsub.subscription.SingleSubscription;
 import pubsub.subscription.Subscription;
 import pubsub.subscription.predicate.string.equality.StringEqualityPredicate;
-import pubsubschord.app.Node;
+import pubsubschord.nodeproxy.Node;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 @Service
 public class PeerService {
@@ -25,7 +23,7 @@ public class PeerService {
         try {
             node = Node.getInstance();
         } catch (RemoteException e) {
-            System.exit(1);
+            throw new RuntimeException("Initialization of node failed.", e);
         }
     }
 
@@ -33,11 +31,11 @@ public class PeerService {
         node.publish(notification);
     }
 
-    public List<Notification> mostRecentNotifications() {
-        ConcurrentLinkedQueue<Notification> queue = node.getNotificatonQueue();
-        List<Notification> l = new ArrayList<>();
+    public List<String> mostRecentNotifications() {
+        LinkedBlockingQueue<Notification> queue = node.getNotificationQueue();
+        List<String> l = new ArrayList<>();
         for(int i = 0; i < TOP && !queue.isEmpty(); i++) {
-            l.add(queue.poll());
+            l.add(queue.poll().notificationJsonString());
         }
         return l;
     }
@@ -53,4 +51,5 @@ public class PeerService {
             return false;
         }
     }
+
 }

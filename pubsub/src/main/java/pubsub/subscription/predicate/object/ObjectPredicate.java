@@ -68,19 +68,16 @@ public class ObjectPredicate extends Predicate<ObjectNode> {
         } else if (valueNode instanceof IntNode && !(predicate.getPredicateType() == PredicateType.LONG)) {
           test = predicate.testWithTypeCastHandling(valueNode.intValue());
         } else if (valueNode instanceof IntNode && predicate.getPredicateType() == PredicateType.LONG) {
-          System.out.println("Long predicate with int value");
           test = predicate.testWithTypeCastHandling(valueNode.longValue());
         } else if (valueNode instanceof LongNode) {
           test = predicate.testWithTypeCastHandling(valueNode.longValue());
         } else if (valueNode instanceof FloatNode && !(predicate.getPredicateType() == PredicateType.DOUBLE)) {
           test = predicate.testWithTypeCastHandling(valueNode.floatValue());
         } else if (valueNode instanceof FloatNode && predicate.getPredicateType() == PredicateType.DOUBLE) {
-          System.out.println("Double predicate with float value");
           test = predicate.testWithTypeCastHandling(valueNode.doubleValue());
         } else if (valueNode instanceof DoubleNode && !(predicate.getPredicateType() == PredicateType.FLOAT)) {
           test = predicate.testWithTypeCastHandling(valueNode.doubleValue());
         } else if (valueNode instanceof DoubleNode && predicate.getPredicateType() == PredicateType.FLOAT) {
-          System.out.println("Float predicate with double value");
           test = predicate.testWithTypeCastHandling(valueNode.floatValue());
         } else if (valueNode instanceof TextNode) {
           test = predicate.testWithTypeCastHandling(valueNode.textValue());
@@ -94,7 +91,6 @@ public class ObjectPredicate extends Predicate<ObjectNode> {
         return false;
       }
       if (!test) {
-        System.out.println("TEST VALUE FAILED !TEST");
         return false;
       }
     }

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: backend-deployment
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-pod
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: backend-pod
+    spec:
+      volumes:
+        - name: my-disk
+          emptyDir: {}
+      containers:
+        - image: docker.io/asmiwdtc/peerservice
+          imagePullPolicy: Always
+          name: backend-container
+          command: ["java", "-jar", "/app/app.jar"]
+#          envFrom:
+#            - configMapRef:
+#                name: node1-config
+#                optional: false
+          volumeMounts:
+            - name: my-disk
+              mountPath: /my-data
+#            - name: http-request-uri
+#              mountPath: /my-config
+          resources: {}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+status: {}

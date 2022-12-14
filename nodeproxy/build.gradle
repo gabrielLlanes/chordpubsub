@@ -18,7 +18,7 @@ tasks.register('uberJar', Jar) {
 
     manifest {
         attributes(
-            'Main-Class': 'pubsubschord.app.App'
+            'Main-Class': 'pubsubschord.nodeproxy.App'
         )
     }
 
@@ -35,5 +35,5 @@ tasks.register('uberJar', Jar) {
 
 application {
     // Define the main class for the application.
-    mainClass = 'pubsubschord.app.App'
+    mainClass = 'pubsubschord.nodeproxy.App'
 }

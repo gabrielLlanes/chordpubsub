@@ -1,8 +1,9 @@
 package lmg.peerservice.httpapiclient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lmg.peerservice.repository.PeerServiceDBRepository;
 import lmg.peerservice.service.PeerService;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import pubsub.notification.Notification;
 
@@ -14,11 +15,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 
 @Service
 public class HttpApiClient {
 
     private final PeerService peerService;
+
+    private final PeerServiceDBRepository peerServiceDBRepository;
 
     private final String notificationName = System.getenv("NOTIFICATION_NAME");
 
@@ -31,9 +35,11 @@ public class HttpApiClient {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    public HttpApiClient(PeerService peerService) throws IOException, URISyntaxException {
+    public HttpApiClient(PeerService peerService, PeerServiceDBRepository peerServiceDBRepository, TaskScheduler taskScheduler) throws IOException, URISyntaxException {
         this.peerService = peerService;
+        this.peerServiceDBRepository = peerServiceDBRepository;
         String httpRequestStringFileLocation = System.getenv("HTTP_REQUEST_FILE_LOCATION");
+        long taskPeriod = Long.parseLong(System.getenv("HTTP_REQUEST_PERIOD"));
         if(httpRequestStringFileLocation != null) {
             httpRequestString = new String(Files.readAllBytes(Path.of(httpRequestStringFileLocation)));
         } else {
@@ -42,9 +48,9 @@ public class HttpApiClient {
         httpRequest = HttpRequest.newBuilder(new URI(httpRequestString))
                 .GET()
                 .build();
+        taskScheduler.scheduleWithFixedDelay(this::request, Duration.ofMillis(taskPeriod));
     }
 
-    @Scheduled(fixedDelay = 20_000)
     private void request() {
         if(httpRequestString == null) {
             return;
@@ -52,7 +58,7 @@ public class HttpApiClient {
         try {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() == 200) {
-                System.out.println(response.body());
+                System.out.println(String.format("Received 200 response with body:\n%s\n", response.body()));
                 Notification notification = new Notification.Builder()
                         ._put(notificationName, "notificationName")
                         .put(objectMapper.readTree(response.body()), "data")

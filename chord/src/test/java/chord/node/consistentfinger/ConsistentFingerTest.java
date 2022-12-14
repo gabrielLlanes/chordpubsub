@@ -3,7 +3,9 @@ package chord.node.consistentfinger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +41,7 @@ public class ConsistentFingerTest {
 
     c1.publish(notification);
 
-    ConcurrentLinkedQueue<Notification> c197Queue = c197.getNotificationQueue();
+    LinkedBlockingQueue<Notification> c197Queue = c197.getNotificationQueue();
 
     assertEquals(c197Queue.size(), 1);
   }
@@ -93,7 +95,7 @@ public class ConsistentFingerTest {
     c18.publish(notification);
     c20.publish(notification);
 
-    ConcurrentLinkedQueue<Notification> notificationQueue = c14.getNotificationQueue();
+    LinkedBlockingQueue<Notification> notificationQueue = c14.getNotificationQueue();
     assertEquals(notificationQueue.size(), 7);
   }
 }

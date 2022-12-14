@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.lang.System.Logger.Level;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hazelcast.config.Config;
@@ -88,7 +89,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    * A queue in which to store all notifications that match the loopback
    * subscription, for receipt by an outside application.
    */
-  transient private ConcurrentLinkedQueue<Notification> notificationQueue = new ConcurrentLinkedQueue<>();
+  transient private LinkedBlockingQueue<Notification> notificationQueue = new LinkedBlockingQueue<>();
 
   /**
    * utility for arithmetic modulo the modulus
@@ -152,7 +153,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
     return id;
   }
 
-  public ConcurrentLinkedQueue<Notification> getNotificationQueue() {
+  public LinkedBlockingQueue<Notification> getNotificationQueue() {
     return notificationQueue;
   }
 
@@ -165,7 +166,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
   }
 
   public void setLoopBackSubscription(Subscription loopBackSubscription) {
-    this.loopBackSubscription = loopBackSubscription;
+
   }
 
   public Subscription getLoopBackSubscription() {
@@ -266,7 +267,14 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
       return;
     }
     if (loopBackSubscription != null && loopBackSubscription.matches(notification)) {
-      notificationQueue.offer(notification);
+      try {
+        boolean offered = notificationQueue.offer(notification, 3, TimeUnit.SECONDS);
+        if(!offered) {
+          log.log(Level.WARNING, "Queue offer timed out. Notification discarded.");
+        }
+      } catch (InterruptedException e) {
+        log.log(Level.WARNING, "Interrupted while blocking on notification offer.");
+      }
       log.log(Level.INFO, "Subscription matched notification: {0}\n", notification.notificationJsonString());
     } else if (loopBackSubscription != null && !loopBackSubscription.matches(notification)) {
       log.log(Level.DEBUG, "DID NOT MATCH: {0} AND {1}\n", notificationJsonString, loopBackSubscription);
@@ -370,7 +378,7 @@ public abstract class AbstractPubSubChordNode<T extends RemotePubSubChordNode<T>
    */
   public void subscribe(Subscription subscription) throws RemoteException {
     lock.lock();
-    setLoopBackSubscription(subscription);
+    loopBackSubscription = subscription;
     for (T client : clients) {
       if (client.getId() != getId()) {
         client.subscribe(subscription, id);

@@ -160,7 +160,8 @@ public class Notification implements java.io.Serializable {
     }
 
     public Notification build() {
-      _put(System.currentTimeMillis(), "timestamp");
+      long timestamp = System.currentTimeMillis();
+      _put(timestamp, "creationTimestamp");
       return new Notification(notificationJson);
     }
 
