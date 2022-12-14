@@ -12,7 +12,3 @@ data:
   NOTIFICATION_NAME: dallas_weather
   HTTP_REQUEST_FILE_LOCATION: "/my-config/http-request-uri"
   HTTP_REQUEST_PERIOD: "5000"
-  DB_URL_FILE_LOCATION: "/db-config/db-url"
-  DB_USERNAME_FILE_LOCATION: "/db-config/db-username"
-  DB_TABLE_FILE_LOCATION: "/db-config/db-table"
-  DB_PASSWORD_FILE_LOCATION: "/db-config/db-password"

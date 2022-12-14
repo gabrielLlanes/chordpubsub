@@ -47,6 +47,9 @@ spec:
             - configMapRef:
                 name: node5-config
                 optional: false
+            - configMapRef:
+                name: database-env
+                optional: false
           volumeMounts:
             - name: my-disk
               mountPath: /my-data
